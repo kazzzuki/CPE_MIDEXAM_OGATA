@@ -1,0 +1,181 @@
+
+  - name: Update Ubuntu Package Cache
+    apt:
+      update_cache: yes
+      state: present
+    when: ansible_distribution == "Ubuntu"
+    async: 3600
+    poll: 0
+
+  - name: Add APT repository keys on Ubuntu
+    apt_key:
+      url: "{{ item }}"
+    loop:
+      - "{{ elasticSearch_ubuntu }}"
+      - "{{ kibana_ubuntu }}"
+      - "{{ logstash_ubuntu }}"
+    when: ansible_distribution == "Ubuntu"
+    async: 3600
+    poll: 0
+
+  - name: Add Elasticsearch, Kibana, Logstash APT repository on Ubuntu
+    apt_repository:
+      repo: "{{ item }}"
+    loop:
+      - "{{ elasticSearch_repo }}"
+      - "{{ kibana_repo }}"
+      - "{{ logstash_repo }}"
+    when: ansible_distribution == "Ubuntu"
+    async: 3600
+    poll: 0
+
+  - name: Install Elasticsearch, Kibana, and Logstash on Ubuntu
+    apt:
+      name: "{{ item }}"
+      state: present
+    loop:
+      - elasticsearch
+      - kibana
+      - logstash
+    when: ansible_distribution == "Ubuntu"
+    async: 3600
+    poll: 0
+
+  - name: Enable Elasticsearch, Kibana, and Logstash on Ubuntu
+    systemd:
+      name: "{{ item }}"
+      enabled: yes
+      state: started
+    loop:
+      - elasticsearch
+      - kibana
+      - logstash
+    when: ansible_distribution == "Ubuntu"
+    async: 3600
+    poll: 0
+
+  - name: Update CentOS Package Cache
+    dnf:
+      update_cache: yes
+      state: present
+      use_backend: dnf
+    when: ansible_distribution == "CentOS"
+    async: 3600
+    poll: 0
+
+  - name: Add RPM repository keys on CentOS
+    command: rpm --import  "{{ item }}"
+    loop:
+      - "{{ elasticSearch_centos }}"
+      - "{{ kibana_centos }}"
+      - "{{ logstash_centos }}"
+    when: ansible_distribution == "CentOS"
+    async: 3600
+    poll: 0
+
+  - name: Add Elasticsearch DNF repository on CentOS
+    yum_repository:
+      name: elasticsearch
+      description: Elasticsearch Repository
+      baseurl: https://artifacts.elastic.co/packages/7.x/yum
+      gpgcheck: yes
+      gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    when: ansible_distribution == "CentOS"
+    async: 3600
+    poll: 0
+
+  - name: Add Kibana DNF repository on CentOS
+    yum_repository:
+      name: kibana
+      description: Kibana Repository
+      baseurl: https://artifacts.elastic.co/packages/7.x/yum
+      gpgcheck: yes
+      gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    when: ansible_distribution == "CentOS"
+    async: 3600
+    poll: 0
+
+  - name: Add Logstash DNF repository on CentOS
+    yum_repository:
+      name: logstash
+      description: Logstash Repository
+      baseurl: https://artifacts.elastic.co/packages/7.x/yum
+      gpgcheck: yes
+      gpgkey: https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    when: ansible_distribution == "CentOS"
+    async: 3600
+    poll: 0
+
+  - name: Install Elasticsearch, Kibana, and Logstash on CentOS
+    dnf:
+      name: "{{ item }}"
+      use_backend: dnf
+      state: present
+    loop:
+      - elasticsearch
+      - kibana
+      - logstash
+    when: ansible_distribution == "CentOS"
+    async: 3600
+    poll: 0
+
+  - name: Enable Elasticsearch, Kibana, and Logstash on CentOS
+    systemd:
+      name: "{{ item }}"
+      enabled: yes
+      state: started
+    loop:
+      - elasticsearch
+      - kibana
+      - logstash
+    when: ansible_distribution == "CentOS"
+    async: 3600
+    poll: 0
+
+  - name: File destination verification
+    file:
+      path: "{{ item.path }}"
+      state: directory
+      mode: "{{ item.mode }}"
+    loop:
+      - { path: /etc/elasticsearch,mode: "0755" }
+      - { path: /etc/kibana,mode: "0755" }
+      - { path: /etc/logstash,mode: "0755" }
+    async: 3600
+    poll: 0
+
+  - name: Copy Elasticsearch config.yml file
+    copy:
+      src: /home/kazuki/CPE_MIDEXAM_OGATA/elasticsearch.yml
+      dest: /etc/elasticsearch/elasticsearch.yml
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: Copy Kibana config.yml file
+    copy:
+      src: /home/kazuki/CPE_MIDEXAM_OGATA/kibana.yml
+      dest: /etc/kibana/kibana.yml
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: Copy Logstash config.yml file
+    copy:
+      src: /home/kazuki/CPE_MIDEXAM_OGATA/logstash.yml
+      dest: /etc/logstash/logstash.yml
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: Restart Elasticsearch, Kibana, and Logstash
+    systemd:
+      name: "{{ item }}"
+      state: restarted
+    loop:
+      - elasticsearcg
+      - kibana
+      - logstash
+    async: 3600
+    poll: 0
+

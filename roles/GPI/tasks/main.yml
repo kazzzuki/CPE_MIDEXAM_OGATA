@@ -1,0 +1,101 @@
+- hosts: GPI
+  become: true
+
+  vars_files:
+    - /home/kazuki/CPE_MIDEXAM_OGATA/config.yaml
+
+  tasks:
+
+  - name: Install prerequisites
+    apt:
+      name:
+        - software-properties-common
+        - apt-transport-https
+        - ca-certificates
+        - curl
+      state: present
+    when: ansible_distribution == "Ubuntu"
+    async: 3600
+    poll: 0
+
+  - name: Add Grafana APT repository key
+    apt_key:
+      url: "{{ grafana_ubuntu }}"
+      state: present
+    when: ansible_distribution == "Ubuntu"
+    async: 3600
+    poll: 0
+
+  - name: Add Grafana APT repository
+    apt_repository:
+      repo: "{{ grafana_repo }}"
+      state: present
+    when: ansible_distribution == "Ubuntu"
+    async: 3600
+    poll: 0
+
+  - name: Update Ubuntu Package Cache
+    apt:
+      update_cache: yes
+      state: present
+    when: ansible_distribution == "Ubuntu"
+    async: 3600
+    poll: 0
+
+  - name: Install Grafana, Prometheus, and Influxdb on Ubuntu
+    apt:
+      name:
+        - grafana
+        - prometheus
+        - influxdb
+      state: present
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+    async: 3600
+    poll: 0
+
+  - name: Update CentOS Package Cache
+    dnf:
+      update_cache: yes
+      state: present
+      use_backend: dnf
+    when: ansible_distribution == "CentOS"
+    async: 3600
+    poll: 0
+
+  - name: Install Grafana, Prometheus, and Influxdb on CentOS
+    dnf:
+      name:
+        - grafana
+        - prometheus
+        - influxdb
+      state: present
+      update_cache: yes
+      use_backend: dnf
+    when: ansible_distribution == "CentOS"
+    async: 3600
+    poll: 0
+
+  - name: Start Grafana on Ubuntu
+    service:
+      name: grafana-server
+      state: started
+      enabled: yes
+
+  - name: Start Grafana on CentOS
+    service:
+      name: grafana
+      state: started
+      enabled: yes
+
+  - name: Start Prometheus on Ubuntu and CentOS
+    service:
+      name: prometheus
+      state: started
+      enabled: yes
+
+  - name: Start Grafana Influxdb on Ubuntu and CentOS
+    service:
+      name: influxdb
+      state: started
+      enabled: yes

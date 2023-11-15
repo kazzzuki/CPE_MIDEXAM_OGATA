@@ -1,0 +1,14 @@
+
+input {
+  tcp {
+    port => 5000
+    codec => json
+  }
+}
+
+output {
+  elasticsearcg {
+    hosts => ["http://localhost:9200"]
+    index => "my_logs"
+  }
+}

@@ -1,0 +1,63 @@
+
+  - name: Update Ubuntu Package Cache
+    apt:
+      update_cache: yes
+      state: present
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Update CentOS Package Cache
+    dnf:
+      update_cache: yes
+      use_backend: dnf
+      state: present
+    when: ansible_distribution == "CentOS"
+
+  - name: Install Httpd, PHP, and MariaDB on Ubuntu
+    apt:
+      name:
+        - apache2
+        - php
+        - libapache2-mod-php
+        - mariadb-server
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+    async: 3600
+    poll: 0
+
+  - name: Install Httpd, PHP, and MariaDB on CentOS
+    dnf:
+      name:
+        - httpd
+        - php
+        - php-mysql
+        - mariadb-server
+      use_backend: dnf
+      state: latest
+    when: ansible_distribution == "CentOS"
+    async: 3600
+    poll: 0
+
+  - name: Start httpd and mariadb on Ubuntu
+    apt:
+      name: "{{ item }}"
+      state: started
+      enabled: yes
+    loop:
+      - apache2
+      - mariadb
+    when: ansible_distribution == "Ubuntu"
+    async: 3600
+    poll: 0
+
+  - name: Start httpd and mariadb on CentOS
+    dnf:
+      name: "{{ item }}"
+      use_backend: dnf
+      state: started
+      enabled: yes
+    loop:
+      - httpd
+      - mariadb
+    when: ansible_distribution == "CentOS"
+    async: 3600
+    poll: 0

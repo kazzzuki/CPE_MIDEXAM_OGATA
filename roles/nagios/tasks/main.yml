@@ -1,0 +1,14 @@
+
+  - name: Update Ubuntu Package Cache
+    apt:
+      update_cache: yes
+      state: present
+    when: ansible_distribution == "Ubuntu"
+
+  - name: Install Nagios in Ubuntu
+    apt:
+      name: nagios4-core
+      state: present
+    when: ansible_distribution == "Ubuntu"
+    async: 3600
+    poll: 0
