@@ -146,7 +146,7 @@
 
   - name: Copy Elasticsearch config.yml file
     copy:
-      src: /home/kazuki/CPE_MIDEXAM_OGATA/elasticsearch.yml
+      src: /home/kazuki/CPE_MIDEXAM_OGATA/configurations/elasticsearch.yml
       dest: /etc/elasticsearch/elasticsearch.yml
       owner: root
       group: root
@@ -154,7 +154,7 @@
 
   - name: Copy Kibana config.yml file
     copy:
-      src: /home/kazuki/CPE_MIDEXAM_OGATA/kibana.yml
+      src: /home/kazuki/CPE_MIDEXAM_OGATA/configurations/kibana.yml
       dest: /etc/kibana/kibana.yml
       owner: root
       group: root
@@ -162,7 +162,7 @@
 
   - name: Copy Logstash config.yml file
     copy:
-      src: /home/kazuki/CPE_MIDEXAM_OGATA/logstash.yml
+      src: /home/kazuki/CPE_MIDEXAM_OGATA/configurations/logstash.yml
       dest: /etc/logstash/logstash.yml
       owner: root
       group: root
@@ -173,7 +173,7 @@
       name: "{{ item }}"
       state: restarted
     loop:
-      - elasticsearcg
+      - elasticsearch
       - kibana
       - logstash
     async: 3600
